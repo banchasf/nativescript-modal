@@ -73,6 +73,13 @@ export class CarListComponent implements OnInit, OnDestroy {
       //     curve: 'ease',
       //   }
       // })},2000);
+      this._routerExtensions.navigate(['/cars/car-detail', tappedCarItem.id], {
+          animated: true,
+          transition: {
+            name: 'slide',
+            duration: 200,
+            curve: 'ease',
+          }});
     }
   }
 }
