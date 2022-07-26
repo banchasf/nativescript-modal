@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit, ViewContainerRef} from '@angular/core'
-import { ModalDialogService, RouterExtensions } from '@nativescript/angular'
+import {ModalDialogService, NSLocationStrategy, RouterExtensions} from '@nativescript/angular'
 import { ListViewEventData } from 'nativescript-ui-listview'
 import { Subscription } from 'rxjs'
 import { finalize } from 'rxjs/operators'
@@ -7,7 +7,8 @@ import { ObservableArray } from '@nativescript/core'
 
 import { Car } from './shared/car.model'
 import { CarService } from './shared/car.service'
-import {SimpleModal} from "./modal/SimpleModal";
+import {LevelOneModal} from "./modal/LevelOneModal";
+import {MerxModalDialogService} from "./MerxModalDialogService";
 
 @Component({
   selector: 'CarsList',
@@ -20,7 +21,9 @@ export class CarListComponent implements OnInit, OnDestroy {
   private _dataSubscription: Subscription
 
   constructor(private _carService: CarService, private _routerExtensions: RouterExtensions,
-              private _modal: ModalDialogService,private _vcRef: ViewContainerRef) {}
+              private _modal: MerxModalDialogService,private _vcRef: ViewContainerRef,
+              private locationStrategy: NSLocationStrategy
+  ) {}
 
   ngOnInit(): void {
     if (!this._dataSubscription) {
@@ -41,6 +44,7 @@ export class CarListComponent implements OnInit, OnDestroy {
       this._dataSubscription.unsubscribe()
       this._dataSubscription = null
     }
+    this._modal.closed$.unsubscribe();
   }
 
   get cars(): ObservableArray<Car> {
@@ -57,29 +61,28 @@ export class CarListComponent implements OnInit, OnDestroy {
       context: {},
       fullscreen: false,
       viewContainerRef: this._vcRef,
-      backdrop: "static"
+      backdrop: "static",
+      disableNavigation: true
     };
+    let depth = this.locationStrategy.path();
+    console.log('Start Depth '+ depth);
+    const status = await this._modal.showModal(LevelOneModal, options);
 
-    const status = await this._modal.showModal(SimpleModal, options);
     if(status){
-      // It is working if I delay 2 seconds. However I think there should be a better way
-      // to check whether the modal is finished completely.
-      // setTimeout(() => {
-      //   this._routerExtensions.navigate(['/cars/car-detail', tappedCarItem.id], {
-      //   animated: true,
-      //   transition: {
-      //     name: 'slide',
-      //     duration: 200,
-      //     curve: 'ease',
-      //   }
-      // })},2000);
+      depth = this.locationStrategy.path();
+      console.log('Final Depth '+ depth);
       this._routerExtensions.navigate(['/cars/car-detail', tappedCarItem.id], {
           animated: true,
           transition: {
             name: 'slide',
             duration: 200,
             curve: 'ease',
-          }});
+          }
+      })
     }
+  }
+
+  delay(timeInMillis: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(() => resolve(), timeInMillis));
   }
 }

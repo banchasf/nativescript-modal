@@ -9,7 +9,9 @@ import { MyListSelectorComponent } from './car-detail-edit/my-list-selector/my-l
 import { CarDetailComponent } from './car-detail/car-detail.component'
 import { CarListComponent } from './car-list.component'
 import { CarsRoutingModule } from './cars-routing.module'
-import { SimpleModal} from './modal/SimpleModal';
+import { LevelOneModal} from './modal/LevelOneModal';
+import { MerxModalDialogService } from "./MerxModalDialogService";
+import {LevelTwoModal} from "./modal/LevelTwoModal";
 
 @NgModule({
   imports: [
@@ -25,10 +27,11 @@ import { SimpleModal} from './modal/SimpleModal';
     MyListSelectorComponent,
     MyListSelectorModalViewComponent,
     MyImageAddRemoveComponent,
-    SimpleModal
+    LevelOneModal,
+    LevelTwoModal
   ],
   entryComponents: [MyListSelectorModalViewComponent],
-  providers: [],
+  providers: [MerxModalDialogService],
   schemas: [NO_ERRORS_SCHEMA],
 })
 export class CarsModule {}
